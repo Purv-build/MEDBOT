@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MedBot Lens | Medicine Awareness Platform</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --primary:#1565c0;
+  --secondary:#0d47a1;
+  --bg:#f4f6f8;
+  --card:#ffffff;
+  --green:#2e7d32;
+  --yellow:#f9a825;
+  --red:#c62828;
+}
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  font-family:system-ui, -apple-system, Arial, sans-serif;
+  background:var(--bg);
+  color:#333;
+  line-height:1.6;
+}
+
+/* HEADER */
+header{
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:white;
+  padding:48px 20px;
+  text-align:center;
+}
+header h1{margin:0;font-size:clamp(2rem,5vw,2.6rem);}
+header p{margin-top:10px;font-size:1.1rem;opacity:.95;}
+
+/* NAV */
+nav{
+  display:flex;
+  justify-content:center;
+  gap:16px;
+  flex-wrap:wrap;
+  background:#0b3c91;
+  padding:12px;
+}
+nav a{
+  color:white;
+  text-decoration:none;
+  font-weight:600;
+}
+
+/* MAIN */
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:30px 16px;
+}
+
+section{margin-bottom:40px;}
+h2{color:var(--secondary);}
+
+/* CARD */
+.card{
+  background:var(--card);
+  padding:22px;
+  border-radius:14px;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+/* SEARCH */
+.search-box{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.search-box input{
+  flex:1;
+  min-width:220px;
+  padding:14px;
+  font-size:1rem;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+.search-box button{
+  padding:14px 24px;
+  font-size:1rem;
+  border:none;
+  border-radius:10px;
+  background:var(--primary);
+  color:white;
+  cursor:pointer;
+}
+
+/* BADGES */
+.badge{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:20px;
+  color:white;
+  font-size:.85rem;
+  margin:6px 0;
+}
+.green{background:var(--green);}
+.yellow{background:var(--yellow);}
+.red{background:var(--red);}
+
+/* DISCLAIMER */
+.disclaimer{
+  background:#fff3cd;
+  padding:14px;
+  border-left:5px solid #ffc107;
+  border-radius:8px;
+  font-size:.9rem;
+  margin-top:14px;
+}
+
+/* FOOTER */
+footer{
+  background:#0b3c91;
+  color:white;
+  text-align:center;
+  padding:28px 16px;
+  font-size:.9rem;
+}
+
+/* RESPONSIVE */
+@media(min-width:768px){
+  .search-box{flex-wrap:nowrap;}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>MedBot Lens</h1>
+  <p>See medicines clearly • Awareness, not medical advice</p>
+</header>
+
+<nav>
+  <a href="#about">About</a>
+  <a href="#india">Indian Context</a>
+  <a href="#search">Search</a>
+  <a href="#disclaimer">Disclaimer</a>
+</nav>
+
+<main>
+
+<section id="about">
+  <h2>About MedBot Lens</h2>
+  <div class="card">
+    MedBot Lens is a medicine awareness platform that helps users understand
+    commonly used medicines using verified public drug-label data.
+    It does not provide dosage or treatment advice.
+  </div>
+</section>
+
+<section id="india">
+  <h2>Indian Context</h2>
+  <div class="card">
+    Indian medicines are often known by brand names like Disprin, Saridon,
+    Crocin, or Naxdom. MedBot Lens maps these brands to their generic drugs
+    and provides safety awareness.
+    <div class="disclaimer">
+      Brand mapping is for awareness only. Self-medication is discouraged.
+    </div>
+  </div>
+</section>
+
+<section id="search">
+  <h2>Search Medicine (Awareness Only)</h2>
+  <div class="card">
+    <div class="search-box">
+      <input id="medicineInput"
+             placeholder="Try: Disprin, Saridon, Naxdom, Crocin">
+      <button onclick="searchMedicine()">Search</button>
+    </div>
+    <div id="result"></div>
+  </div>
+</section>
+
+<section id="disclaimer">
+  <h2>Disclaimer</h2>
+  <div class="disclaimer">
+    MedBot Lens is for educational awareness only.
+    It does not provide medical advice, diagnosis, or treatment.
+    Always consult a qualified healthcare professional.
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p><strong>Developed & Owned by Purv</strong></p>
+  <p>With gratitude to <strong>Anju Kangda Mam</strong></p>
+  <p>© 2026 MedBot Lens</p>
+</footer>
+
+<script>
+const cache = {};
+
+// Indian brand → generic
+const medicineMap = {
+  "paracetamol":"acetaminophen","crocin":"acetaminophen",
+  "calpol":"acetaminophen","dolo":"acetaminophen",
+  "saridon":"acetaminophen",
+  "disprin":"aspirin","desprin":"aspirin",
+  "naxdom":"naproxen",
+  "combiflam":"ibuprofen","brufen":"ibuprofen",
+  "cetzine":"cetirizine","okacet":"cetirizine",
+  "azithral":"azithromycin",
+  "eno":"sodium bicarbonate"
+};
+
+// Drug awareness + risk
+const drugAwareness = {
+  "acetaminophen":{
+    type:"Pain reliever",
+    contains:"Acetaminophen",
+    risk:"yellow",
+    harm:"Overuse may damage the liver.",
+    prevention:"Avoid frequent use without medical advice."
+  },
+  "aspirin":{
+    type:"NSAID",
+    contains:"Aspirin",
+    risk:"yellow",
+    harm:"May cause stomach irritation or bleeding.",
+    prevention:"Use only with medical guidance."
+  },
+  "ibuprofen":{
+    type:"NSAID",
+    contains:"Ibuprofen",
+    risk:"yellow",
+    harm:"Long-term misuse may affect stomach or kidneys.",
+    prevention:"Avoid prolonged use without supervision."
+  },
+  "naproxen":{
+    type:"NSAID",
+    contains:"Naproxen",
+    risk:"yellow",
+    harm:"Misuse may cause stomach issues.",
+    prevention:"Medical supervision is recommended."
+  },
+  "azithromycin":{
+    type:"Antibiotic",
+    contains:"Azithromycin",
+    risk:"red",
+    harm:"Improper use can cause antibiotic resistance.",
+    prevention:"Use only when prescribed by a doctor."
+  },
+  "cetirizine":{
+    type:"Antihistamine",
+    contains:"Cetirizine",
+    risk:"green",
+    harm:"May cause drowsiness in some people.",
+    prevention:"Avoid unnecessary use."
+  }
+};
+
+function riskLabel(level){
+  if(level==="green") return `<span class="badge green">Low Risk</span>`;
+  if(level==="yellow") return `<span class="badge yellow">Moderate Risk</span>`;
+  if(level==="red") return `<span class="badge red">High Risk / Caution</span>`;
+  return "";
+}
+
+function searchMedicine(){
+  let medicine=document.getElementById("medicineInput").value.trim().toLowerCase();
+  const result=document.getElementById("result");
+
+  if(!medicine){ result.innerHTML="<p>Please enter a medicine name.</p>"; return; }
+  if(medicineMap[medicine]) medicine=medicineMap[medicine];
+  if(cache[medicine]){ result.innerHTML=cache[medicine]; return; }
+
+  result.innerHTML="<p>🔍 Fetching information…</p>";
+
+  const controller=new AbortController();
+  setTimeout(()=>controller.abort(),5000);
+
+  fetch(`https://api.fda.gov/drug/label.json?search=openfda.generic_name:${medicine}&limit=1`,
+        {signal:controller.signal})
+  .then(r=>r.json())
+  .then(data=>{
+    if(!data.results){ result.innerHTML="<p>No information found.</p>"; return; }
+
+    const m=data.results[0];
+    let awareness="";
+    if(drugAwareness[medicine]){
+      const d=drugAwareness[medicine];
+      awareness=`
+        <h4>🧠 Drug Awareness</h4>
+        ${riskLabel(d.risk)}
+        <p><strong>Category:</strong> ${d.type}</p>
+        <p><strong>Contains:</strong> ${d.contains}</p>
+        <p><strong>Possible Harm:</strong> ${d.harm}</p>
+        <p><strong>Prevention:</strong> ${d.prevention}</p>
+      `;
+    }
+
+    const html=`
+      <h3>Medicine Information</h3>
+      <p><strong>Generic Name:</strong> ${m.openfda?.generic_name?.[0]||"N/A"}</p>
+      <p><strong>Purpose:</strong> ${m.purpose?.[0]||"N/A"}</p>
+      <p><strong>Warnings:</strong> ${m.warnings?.[0]||"N/A"}</p>
+      <p><strong>Side Effects:</strong> ${m.adverse_reactions?.[0]||"N/A"}</p>
+      ${awareness}
+      <p style="font-size:13px;color:#555;">Source: openFDA</p>
+      <div class="disclaimer">Awareness only. Consult a healthcare professional.</div>
+    `;
+    cache[medicine]=html;
+    result.innerHTML=html;
+  })
+  .catch(()=>{
+    result.innerHTML="<p>⚠️ Network slow. Please try again.</p>";
+  });
+}
+</script>
+
+</body>
+</html>
